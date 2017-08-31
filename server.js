@@ -23,7 +23,7 @@ var express = require('express'),
 
 
 /**
-  * @desc various dependencies 
+  * @desc various dependencies
 */
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -69,7 +69,7 @@ var dbInfo = {
         color:{r:'76',g:'164',b:'84'},
         formFields:[
           {name:'need', type:'radio', options:['have','want'], default:'have'},
-          {name:'description',type:'textarea'}, 
+          {name:'description',type:'textarea'},
           {name:'location',type:'text'},
           {name:'image search', type:'image-search'},
           {name:'imageURL', type:'url'}
@@ -80,7 +80,7 @@ var dbInfo = {
         color:{r:'68',g:'114',b:'185'},
         formFields:[
           {name:'need', type:'radio', options:['have','want'], default:'have'},
-          {name:'description',type:'textarea'}, 
+          {name:'description',type:'textarea'},
           {name:'location',type:'text'},
           {name:'image search', type:'image-search'},
           {name:'imageURL', type:'url'}
@@ -94,7 +94,7 @@ var dbInfo = {
 		  {name:'image search', type:'image-search'},
           {name:'imageURL', type:'url'}
         ]
-      }, 
+      },
       {
         name:'book',
         color:{r:'190',g:'76',b:'57'},
@@ -139,17 +139,17 @@ ers = [{name:'steve', email:'steven.c.hein@gmail.com'}, {name:'steve2',email:'im
   * @desc creates the "session" that allows users to make edits - should definitely be changed
   * @param string email
   		   string token
-  		   string useSpecial 
+  		   string useSpecial
   * @return bool - success or failure
 */
 app.post('/api/auth', express.json(), function (req, res) {
-	if ((req.body.email !== '')&&(typeof req.body.email !== 'undefined')){ 
+	if ((req.body.email !== '')&&(typeof req.body.email !== 'undefined')){
 		if (req.body.useSpecial === true) {
 			//assign a special token
 		}
-		
+
 		if (users[req.body.email]===req.body.token) {
-		
+
 			req.session.user=req.body.email;
 			res.send(true);
 
@@ -166,7 +166,7 @@ app.post('/api/auth', express.json(), function (req, res) {
   * @return int - 200 (ok) or 500 (error...)
 */
 app.post('/api/authGen', express.json(), function (req, res) {
-	if ((req.body.email !== '')&&(typeof req.body.email !== 'undefined')){ 
+	if ((req.body.email !== '')&&(typeof req.body.email !== 'undefined')){
 		var key = generateKey();
 
 		console.log('trying to send email to ' + req.body.email);
@@ -177,11 +177,11 @@ app.post('/api/authGen', express.json(), function (req, res) {
 		    text: 'text body',
 		    html: "<a href='http://colablife.info/#/auth/"+key+"'>YES!</a>"
 		}, function (err, doc){
-		    if(err){ console.log(err); }else{ 
+		    if(err){ console.log(err); }else{
 		    	//email was sent!
 		    	users[req.body.email]=key;
 		    	res.send(200);
-		    	console.log('Message sent: ' + doc.response); 
+		    	console.log('Message sent: ' + doc.response);
 		    }
 		});
 
@@ -210,7 +210,7 @@ app.get('/api/getDatabase', function (req, res) {
   * items of with the "types" defined in the dbInfo object (authentication commented out) - used to generate lists of "projects" or "books", etc.
   * @param string type
   		   string forUID
-  		   string forOwner 
+  		   string forOwner
   * @return object - array of "items"
 */
 app.post('/api/getItems', express.json(), function (req, res) {
@@ -225,7 +225,7 @@ app.post('/api/getItems', express.json(), function (req, res) {
 		db.itemdb.find(query,function (err, docs) {
 			if(err){ console.log('(error getting items) '+err); }else{ res.send(docs); }
 		});
-	//} 
+	//}
 });
 
 
@@ -237,8 +237,8 @@ app.post('/api/getItems', express.json(), function (req, res) {
 */
 app.post('/api/getItemHistory', express.json(), function (req, res) {
 	db.itemdb.find({type:'history', forUID:req.body.uid},function (err, docs) {
-		if(err){ console.log('(error getting item history) '+err); }else{ 
-			res.send(docs); 
+		if(err){ console.log('(error getting item history) '+err); }else{
+			res.send(docs);
 		}
 	});
 
@@ -279,15 +279,15 @@ app.post('/api/saveItem', express.json({limit: '50mb'}), function (req, res) {
 				syncItemPromise=updateItem(req.body.item, check[0], req.body.unlock);
 				q.when(syncItemPromise).then(function(){
 					res.send(200);
-				}); 
+				});
 			});
 		} else {
 			//brand new item!!!
 			syncItemPromise=newItem(req.body.item);
 			q.when(syncItemPromise).then(function(){
 				res.send(200);
-			}); 
-			
+			});
+
 		}
 	}
 });
@@ -315,7 +315,7 @@ app.post('/api/pushToItem', express.json({limit: '50mb'}), function (req, res) {
 				syncItemPromise=updateItem(extendedItem, check[0]);
 				q.when(syncItemPromise).then(function(){
 					res.send(200);
-				}); 
+				});
 			});
 		} else { res.send(500); }
 	}
@@ -359,10 +359,10 @@ app.post('/api/proposalResult', express.json(), function (req, res) {
 						if(extendedItem[member.name].what !== "approve"){ approved = false; }
 					});
 					console.log("approval is currently: "+approved);
-					if (approved){ 
+					if (approved){
 						//update the item
 						db.itemdb.find({uid:extendedItem.forUID}, function (err, check2){
-							if(err){ console.log('(error getting item) '+err); }else{ 
+							if(err){ console.log('(error getting item) '+err); }else{
 								//clone and add approval
 								var approvalItem = __.cloneDeep(check2[0]);
 								_.extend(approvalItem,{approval:true});
@@ -372,7 +372,7 @@ app.post('/api/proposalResult', express.json(), function (req, res) {
 						});
 					}
 					res.send(200);
-				}); 
+				});
 			});
 		} else { res.send(500); }
 	} else { res.send(500); }
@@ -380,9 +380,9 @@ app.post('/api/proposalResult', express.json(), function (req, res) {
 
 /**
   * @api - save proposal
-  * @desc creates a proposal object and stores some unique keys on the server for specific "links" send to each member 
+  * @desc creates a proposal object and stores some unique keys on the server for specific "links" send to each member
   * for voting/commenting (requires server variable "members")
-  * @param object - the proposal 
+  * @param object - the proposal
   * @return string - uid
 */
 app.post('/api/saveProposal', express.json(), function (req, res) {
@@ -394,24 +394,24 @@ app.post('/api/saveProposal', express.json(), function (req, res) {
 		var keys={};
 
 		//put in the members
-		_(members).each(function(member){ 
+		_(members).each(function(member){
 			req.body[member.name]={};
 			req.body[member.name].who = member.name;
 			keys[member.name] = generateUID();
 		});
 
-		db.itemdb.insert(req.body, function (err, doc) { 
-		if(err){ 
+		db.itemdb.insert(req.body, function (err, doc) {
+		if(err){
 			console.log('(error saving proposal) '+err);
-		}else{ 
+		}else{
 			console.log('proposal: ' + doc.uid);
-			io.emit('newProposal', doc.uid); 
+			io.emit('newProposal', doc.uid);
 
 			//email all members
 			_(members).each(function(member){
 				if (member.email){
 					var key = keys[member.name];
-				
+
 					console.log('trying to send email to ' + member.email);
 					smtpTrans.sendMail({
 					    from: 'Robot <colabrobot@gmail.com>',
@@ -420,10 +420,10 @@ app.post('/api/saveProposal', express.json(), function (req, res) {
 					    text: 'text body',
 					    html: "<p>Human,</p><p>A new proposal has been created. Please follow the link below to review everything, and fill in your decision and/or comments. The link was generated specifically for you so don't share. Please reply to me if you have any questions. I am a robot. Thank you.</p><p><a href='http://colablife.info/#/proposal/"+req.body.uid+"/"+key+"'>"+member.name+"'s response</a>"
 					}, function (err, doc){
-					    if(err){ console.log(err); }else{ 
+					    if(err){ console.log(err); }else{
 					    	//email was sent!
 					    	proposalSecrets[req.body.uid].push({name:member.name,key:key});
-					    	console.log('Message sent: ' + doc.response); 
+					    	console.log('Message sent: ' + doc.response);
 					    }
 					});
 
@@ -431,7 +431,7 @@ app.post('/api/saveProposal', express.json(), function (req, res) {
 			});
 
 			res.send(doc.uid);
-		} 
+		}
 	});
 	}
 });
@@ -452,8 +452,8 @@ app.post('/api/checkResultee', express.json(), function (req, res){
 
 	if (name!=='') {
 		res.send(name);
-	} else { 
-		res.send(false); 
+	} else {
+		res.send(false);
 	}
 });
 
@@ -489,7 +489,7 @@ app.post('/api/stageItemChanges', express.json(), function (req, res) {
 					newItem.image = 'media/images/'+mediaUID+'/image.jpg';
 					newItem.thumb = 'media/images/'+mediaUID+'/thumb.jpg';
 				}
-				
+
 				var changeNumber = 0;
 				for (key in newItem){
 					if (JSON.stringify(newItem[key])!==JSON.stringify(originalItem[key])){
@@ -512,14 +512,14 @@ app.post('/api/stageItemChanges', express.json(), function (req, res) {
 				var promises=[];
 				if (stagedChanges.length!==0){
 					//insert change for every owner to approve
-					_.each(originalItem.owners, function(owner) { 
+					_.each(originalItem.owners, function(owner) {
 						var insertFinished=q.defer();
 						promises.push(insertFinished.promise);
 						db.itemdb.insert({type:'staged', forUID:newItem.uid, key:newKey, proposed:moment().format(), proposedBy:proposer, forOwner:owner, changes:stagedChanges}, function (err, doc) {
-							if(err){ 
+							if(err){
 								console.log('(error staging item changes) '+err);
 								insertFinished.reject();
-							}else{ 
+							}else{
 								originalItem.proposedChanges=true;
 								insertFinished.resolve();
 							}
@@ -528,8 +528,8 @@ app.post('/api/stageItemChanges', express.json(), function (req, res) {
 
 					q.all(promises).then(function(){
 						db.itemdb.update({uid: newItem.uid}, {$set:{proposedChanges:true}}, function (err, doc2) {
-							if(err){ 
-								console.log('(error setting staged changes flag on item) '+err); 
+							if(err){
+								console.log('(error setting staged changes flag on item) '+err);
 							} else {
 								//success
 								res.send(200);
@@ -537,7 +537,7 @@ app.post('/api/stageItemChanges', express.json(), function (req, res) {
 							}
 						});
 					}, function(error) { res.send('one of the promises fucked up'); });
-					
+
 				} else {
 					//no mods
 				}
@@ -546,7 +546,7 @@ app.post('/api/stageItemChanges', express.json(), function (req, res) {
 				//fail - no proposedBy
 			}
 		});
-	} else { 
+	} else {
 		//no item found matching that uid
 	}
 });
@@ -596,8 +596,8 @@ app.post('/api/decision', express.json(), function (req, res){
 							res.send(200);
 						});
 					});
-				}); 	
-			}); 
+				});
+			});
 		});
 	}
 });
@@ -623,7 +623,7 @@ app.post('/api/deleteItem', express.json(), function (req, res){
 			syncItemPromise=updateItem(req.body, check[0]);
 			q.when(syncItemPromise).then(function(){
 				res.send(200);
-			}); 
+			});
 		});
 	}
 
@@ -633,7 +633,7 @@ app.post('/api/deleteItem', express.json(), function (req, res){
 /**
   * @api - request lock
   * @desc Items are locked when someone is editing - this function asks if a lock is available or not. if the item is not currently
-  * locked, changeLock() is called. SOmething is broken with this, but it mostly works - I like this method, but a more granular 
+  * locked, changeLock() is called. SOmething is broken with this, but it mostly works - I like this method, but a more granular
   * approach to locking would be better - like only lock the pieces that are being edited, not the whole thing
   * @param object - lock object (uid for lock, email of user)
   * @return object - the locked item
@@ -645,7 +645,7 @@ app.post('/api/requestLock', express.json(), function (req, res){
 		var syncLockPromise;
 		db.itemdb.findOne({uid:req.body.uid}, function (err, item){
 			if(err||!item){ console.log('(error requesting lock on item) '+err); }
-			else { 
+			else {
 				if (item.lock){
 					//already has a lock
 					console.log('we are here....')
@@ -656,7 +656,7 @@ app.post('/api/requestLock', express.json(), function (req, res){
 					q.when(syncLockPromise).then(function(){
 						res.send(item);
 					});
-					
+
 				}
 			}
 		});
@@ -678,7 +678,7 @@ app.post('/api/removeLock', express.json(), function (req, res){
 			console.log('removing lock for item: '+req.body.uid)
 			db.itemdb.findOne({uid:req.body.uid}, function (err, item){
 				if(err||!item){ console.log('(error removing lock on item) '+err); }
-				else { 
+				else {
 					syncLockPromise = changeLock(item,req.body.email, false);
 					q.when(syncLockPromise).then(function(){
 						res.send(item);
@@ -703,14 +703,14 @@ app.post('/api/pickLock', express.json(), function (req, res){
 		console.log('breaking lock for item: '+req.body.uid)
 		db.itemdb.findOne({uid:req.body.uid}, function (err, item){
 			if(err||!item){ console.log('(error removing lock on item) '+err); }
-			else { 
+			else {
 				if(_.contains(item.owners, req.body.email)){
 					syncLockPromise = changeLock(item,req.body.email, false);
 					q.when(syncLockPromise).then(function(){
 						res.send(item);
 					});
-				} else { 
-					//send the owner an email 
+				} else {
+					//send the owner an email
 				}
 			}
 		});
@@ -731,7 +731,7 @@ app.post('/api/setPriority', express.json(), function (req, res){
 		var currentPriority;
 		db.itemdb.findOne({uid:req.body.uid},function (err, doc) {
 			if(err){ console.log('(error finding item) '+err); }
-			else { 
+			else {
 				if (doc.priority){
 					//exists
 					currentPriority=doc.priority;
@@ -758,9 +758,9 @@ app.post('/api/setPriority', express.json(), function (req, res){
 			 	if (newPriority){
 			 		doc.priority=newPriority;
 				 	db.itemdb.update({uid:req.body.uid}, {$set:{priority:newPriority, totalPriority:totalPriority}}, function (err,doc2){
-				 		if(err){ console.log('(error updating priority) '+err); }else{ 
+				 		if(err){ console.log('(error updating priority) '+err); }else{
 				 			io.emit('priorityChange', doc);
-				 			res.send(doc); 
+				 			res.send(doc);
 				 		}
 				 	});
 				}
@@ -781,18 +781,18 @@ app.post('/api/addComment', express.json(), function (req, res) {
 	} else {
 		db.itemdb.findOne({uid:req.body.uid}, function (err, item){
 			if(err){ console.log('(error finding item) '+err); }
-			else { 
+			else {
 				if(!item.comments) { item.comments = []; }
 				var timeTime = moment().format();
 				item.comments.push({words:req.body.comment, by:req.body.email, time:timeTime});
 
 				var pushValue = {};
 				pushValue.$set = {};
-				pushValue.$set['comments'] = item.comments; 
+				pushValue.$set['comments'] = item.comments;
 				db.itemdb.update({uid: req.body.uid}, pushValue, function (err, doc) {
-					if(err){ console.log('(error updating comments) '+err); }else{ 
+					if(err){ console.log('(error updating comments) '+err); }else{
 						io.emit('comment', item);
-						res.send(doc); 
+						res.send(doc);
 					}
 				});
 			}
@@ -826,12 +826,12 @@ function updateItem(newItem, oldItem, unlock){
 			//new image added
 			console.log('saving new media image')
 			var mediaImageUID=generateUID();
-			
+
 			syncMediaImagePromise = saveMediaImage(newMediaImage.rawImage, mediaImageUID);
 			_.each(newItem.media, function (data,index){
 				//find the index and replace with new data
 				if (_.has(data,'rawImage')) {
-					
+
 					delete newItem.media[index].rawImage;
 					newItem.media[index].image = 'media/images/'+mediaImageUID+'/image.jpg';
 					newItem.media[index].thumb = 'media/images/'+mediaImageUID+'/thumb.jpg';
@@ -902,19 +902,19 @@ function updateItem(newItem, oldItem, unlock){
 	if (unlock) { newItem.lock=false; }
 	delete newItem._id;
 	//check to see if new image was sent
-	
+
 	db.itemdb.update({uid: newItem.uid}, newItem, function (err, doc) {
-		if(err){ 
-			console.log('(error updating item) '+err); 
-			saveItemPromise.reject(); 
-		}else{ 
+		if(err){
+			console.log('(error updating item) '+err);
+			saveItemPromise.reject();
+		}else{
 			q.when(syncImagePromise).then(function(){
 				q.when(syncMediaImagePromise).then(function(){
 					saveItemPromise.resolve();
 					console.log('sending new update io.emit');
 					io.emit('update', newItem);
 				});
-			}); 
+			});
 		}
 	});
 
@@ -946,17 +946,17 @@ function newItem(newItem){
 		newItem.image = defaultImage;
 		newItem.thumb = defaultImage;
 	}
-	db.itemdb.insert(newItem, function (err, doc) { 
-		if(err){ 
+	db.itemdb.insert(newItem, function (err, doc) {
+		if(err){
 			console.log('(error saving item) '+err);
-			saveItemPromise.reject(); 
-		}else{ 
+			saveItemPromise.reject();
+		}else{
 			q.when(syncImagePromise).then(function(){
 				saveItemPromise.resolve();
 				console.log('item: ' + doc.uid);
 			    io.emit('new', doc);
-			}); 
-		} 
+			});
+		}
 	});
 
 	return saveItemPromise.promise;
@@ -972,25 +972,25 @@ function saveImage(where,theUID,who) {
 		var path = '/vagrant/www/media/images/'+theUID+'/';
 		fs.mkdir(path, function(err){
 			if (err) {
-				console.log('error saving image: '+err); 
+				console.log('error saving image: '+err);
 	    		saveImagePromise.reject();
 			} else {
 				fs.writeFile(path+"image.jpg", body, 'binary', function(err) {
-			    	if(err) { 
-			    		console.log('error saving image: '+err); 
+			    	if(err) {
+			    		console.log('error saving image: '+err);
 			    		saveImagePromise.reject();
-			    	}else{ 
+			    	}else{
 			    		//save image thumbnail
-			    		
-			    		console.log("the image was saved!"); 
+
+			    		console.log("the image was saved!");
 			    		gm(path+'image.jpg').resize('60','60').gravity('center').write(path+'thumb.jpg', function(err) {
-			    			if(err) { 
-			    				console.log('error saving thumb: '+err); 
+			    			if(err) {
+			    				console.log('error saving thumb: '+err);
 			    				saveImagePromise.reject();
-			    			}else{ 
+			    			}else{
 			    				//successful image save chain:
 			    				saveImagePromise.resolve();
-			    				console.log("the image thumb was saved!"); 
+			    				console.log("the image thumb was saved!");
 			    			}
 			    		});//end save image thumb
 			    	}//end save image
@@ -1009,7 +1009,7 @@ function saveMediaImage(rawImage, uid) {
     var path = '/vagrant/www/media/images/'+uid+'/';
     fs.mkdir(path, function(err){
 		if (err) {
-			console.log('error saving image: '+err); 
+			console.log('error saving image: '+err);
     		saveMediaImagePromise.reject();
 		} else {
 			//file path successful
@@ -1020,21 +1020,21 @@ function saveMediaImage(rawImage, uid) {
 				image.type = matches[1];
 				image.data = new Buffer(matches[2], 'base64');
 
-				fs.writeFile(path+'image.jpg', image.data, function(err) { 
-					if(err) { 
-			    		console.log('error saving media image: '+err); 
+				fs.writeFile(path+'image.jpg', image.data, function(err) {
+					if(err) {
+			    		console.log('error saving media image: '+err);
 			    		saveMediaImagePromise.reject();
-			    	}else{ 
+			    	}else{
 			    		//save media image thumbnail
-			    		console.log("the f'n image was saved!"); 
+			    		console.log("the f'n image was saved!");
 			    		gm(path+'image.jpg').resize('300','300').gravity('center').write(path+'thumb.jpg', function(err) {
-			    			if(err) { 
-			    				console.log('error saving media thumb: '+err); 
+			    			if(err) {
+			    				console.log('error saving media thumb: '+err);
 			    				saveMediaImagePromise.reject();
-			    			}else{ 
+			    			}else{
 			    				//successful image save chain:
 			    				saveMediaImagePromise.resolve();
-			    				console.log("the image thumb was saved!"); 
+			    				console.log("the image thumb was saved!");
 			    			}
 			    		});//end save image thumb
 			    	}//end save image
@@ -1055,8 +1055,8 @@ function changeLock(item,who,value){
 	item.lockChangedAt=time;
 
 	db.itemdb.update({uid: item.uid}, {$set:{lock:value, lockChangedBy:who, lockChangedAt:time}}, function (err, doc) {
-		if(err){ 
-			console.log('(error changing lock on item) '+err); 
+		if(err){
+			console.log('(error changing lock on item) '+err);
 			changeLockPromise.reject();
 		} else {
 			//success
@@ -1077,8 +1077,8 @@ function changeDecision(staged, who, what, value){
 	});
 
 	db.itemdb.update({key: staged.key}, {$set:{changes:staged.changes}}, function (err, doc) {
-		if(err){ 
-			console.log('(error changing decisions on item) '+err); 
+		if(err){
+			console.log('(error changing decisions on item) '+err);
 			changeDecisionPromise.reject();
 		} else {
 			//success
@@ -1088,7 +1088,7 @@ function changeDecision(staged, who, what, value){
 	});
 
 	return changeDecisionPromise.promise;
-} 
+}
 
 function findItem(uid){
 	var p=q.defer();
@@ -1098,7 +1098,7 @@ function findItem(uid){
 	return p.promise;
 }
 
-	
+
 
 //DICTIONARIES --------------------------------
 

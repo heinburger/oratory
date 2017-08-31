@@ -19,8 +19,8 @@ itemApp.factory('master', function($http, $q, $state){
   $http.get('/api/getDbInfo').then(function (response){
     angular.copy(response.data, service.getDbInfo);
 
-    service.getDbInfo.getFields = function(type) { 
-      var type = _(service.getDbInfo.types).findWhere({name:type}); 
+    service.getDbInfo.getFields = function(type) {
+      var type = _(service.getDbInfo.types).findWhere({name:type});
       return type && type.formFields;
     };
 
@@ -34,8 +34,8 @@ itemApp.factory('master', function($http, $q, $state){
   //init data
   service.refreshItems();
 
-  service.color = function (item) { 
-    var type = _(service.getDbInfo.types).findWhere({name: item.type}); 
+  service.color = function (item) {
+    var type = _(service.getDbInfo.types).findWhere({name: item.type});
     return type && type.color;
   };
 
@@ -50,11 +50,11 @@ itemApp.factory('master', function($http, $q, $state){
   service.deleteItem = function(itemToBeDeleted){
     return $http.post('/api/deleteItem', itemToBeDeleted).success(function (data){
       return service.refreshItems().then(function (data){
-        return window.history.back(); 
-      }); 
+        return window.history.back();
+      });
     });
   };
-  
+
   //SHARED DATA
   service.sharedData = {};
   service.sharedData.filter = '';
@@ -85,7 +85,7 @@ itemApp.factory('master', function($http, $q, $state){
     var priorityByEmail, priorityOfWhat;
     priorityOfWhat = _.filter(service.items, function(item){ return item.type === what && item.priority });
 
-    _(priorityOfWhat).each(function(item){ 
+    _(priorityOfWhat).each(function(item){
       if(!item.priorityByEmail){ item.priorityByEmail={}; }
       var theP = _.find(item.priority, function(p){ return p.email === who; });
       item.priorityByEmail[what] = (theP && theP.value) || 0;
@@ -105,8 +105,8 @@ itemApp.config(function($stateProvider, $urlRouterProvider){
       templateUrl: 'html/auth.html',
       controller: function($scope, $state, $http, $stateParams, master) {
         $scope.email=master.sharedData.email;
-        
-        if($stateParams.key) { 
+
+        if($stateParams.key) {
           $scope.token=$stateParams.key;
           $scope.key=$stateParams.key;
         }else {
@@ -115,16 +115,16 @@ itemApp.config(function($stateProvider, $urlRouterProvider){
 
         $scope.authUser = function(){
           //DEV
-          
-          master.sharedData.email=$scope.email;
-          $.cookie('email', $scope.email);
-          master.sharedData.token='123';
-          $.cookie('token', '123');
-          $state.go('everything');
-          
-          
+
+          // master.sharedData.email=$scope.email;
+          // $.cookie('email', $scope.email);
+          // master.sharedData.token='123';
+          // $.cookie('token', '123');
+          // $state.go('everything');
+
+
           //PRODUCTION
-          /*
+
           master.sharedData.email=$scope.email;
           $.cookie('email', $scope.email);
           master.sharedData.token=$scope.token;
@@ -139,8 +139,7 @@ itemApp.config(function($stateProvider, $urlRouterProvider){
               $('#sentanddone').html('<h3>please close this window and check your email</h3>');
             });
           }
-          */
-          
+
         };
 
       }
@@ -379,7 +378,7 @@ itemApp.config(function($stateProvider, $urlRouterProvider){
         $scope.sharedData.scrollTop();
 
         //get item
-        master.items = items; 
+        master.items = items;
 
         $scope.item = _(master.items).findWhere({uid:$scope.proposal.forUID});
 
@@ -404,7 +403,7 @@ itemApp.config(function($stateProvider, $urlRouterProvider){
 
       }
     });
-    
+
     $urlRouterProvider.otherwise('/');
 
 });
@@ -415,9 +414,9 @@ itemApp.controller('appCtrl', function ($scope, $http, $state, master) {
   $scope.sharedData = master.sharedData;
   $scope.sharedData.options=false;
 
-  $scope.$on('$stateChangeSuccess', function(event, toState, toParam, fromState, fromParam){ 
-    $scope.page = toState.name;   
-  
+  $scope.$on('$stateChangeSuccess', function(event, toState, toParam, fromState, fromParam){
+    $scope.page = toState.name;
+
     if ((fromState.name === 'edit')) {
       //remove lock if someone hits "back"
       lockedItem=_($scope.items).findWhere({uid:fromParam.uid})
@@ -442,11 +441,11 @@ itemApp.controller('appCtrl', function ($scope, $http, $state, master) {
   $scope.showOptions = function(){
     $scope.sharedData.options=!$scope.sharedData.options;
   }
- 
+
   $scope.addNew = function() {
     $state.go('new');
   };
-  
+
   $scope.removeUser = function() {
     $.cookie('email', '');
     $.cookie('token', '');
@@ -455,12 +454,12 @@ itemApp.controller('appCtrl', function ($scope, $http, $state, master) {
     $state.go('auth');
   };
 
-  $scope.$on('cancelForm',function(){ 
+  $scope.$on('cancelForm',function(){
     window.history.back();
   });
 
-  $scope.$watch('sharedData.showDeleted', function(hide) { 
-    if (hide) { 
+  $scope.$watch('sharedData.showDeleted', function(hide) {
+    if (hide) {
       master.sharedData.deletedFilter = {};
     } else {
       master.sharedData.deletedFilter = {type:'!deleted'};
@@ -472,7 +471,7 @@ itemApp.controller('appCtrl', function ($scope, $http, $state, master) {
     master.items.push(item);
     $scope.$digest();
   });
-  
+
   socket.on('newProposal', function(prop){
     $('#socket-messages').append('<p>new proposal was added...</p>');
   });
@@ -495,7 +494,7 @@ itemApp.controller('appCtrl', function ($scope, $http, $state, master) {
   socket.on('priorityChange', function(item){
     console.log('priority changed! - '+item.name+' is now '+item.totalPriority);
     angular.copy(item,_(master.items).findWhere({uid:item.uid}));
-    master.setItemPriorities(); 
+    master.setItemPriorities();
     $scope.$digest();
   });
 
@@ -503,7 +502,7 @@ itemApp.controller('appCtrl', function ($scope, $http, $state, master) {
     console.log('new comment for '+item.name+'!');
     angular.copy(item,_(master.items).findWhere({uid:item.uid}));
     if (item.uid == master.item.uid) { angular.copy(item,master.item); }
-    master.setItemPriorities(); 
+    master.setItemPriorities();
     $scope.$digest();
   });
 
@@ -562,9 +561,9 @@ itemApp.directive('insertForm', function (master, $state, $http) {
       scope.sharedData = master.sharedData;
 
       //setup form item
-      if(!scope.formItem) { 
-        scope.formItem={}; 
-        scope.formItem.name=scope.filter; 
+      if(!scope.formItem) {
+        scope.formItem={};
+        scope.formItem.name=scope.filter;
       }
 
       if (scope.formItem.type !== 'deleted') {
@@ -581,16 +580,16 @@ itemApp.directive('insertForm', function (master, $state, $http) {
 
       scope.saveItem = function(itemToBeAdded) {
         //validate and add
-        if (scope.form.$valid) { 
-          if(!itemToBeAdded.createdBy) { 
-            itemToBeAdded.createdBy = scope.sharedData.email; 
+        if (scope.form.$valid) {
+          if(!itemToBeAdded.createdBy) {
+            itemToBeAdded.createdBy = scope.sharedData.email;
           } else {
             itemToBeAdded.editedBy = scope.sharedData.email;
           }
 
-          master.saveItem(itemToBeAdded,true); 
-          master.sharedData.filter=''; 
-          scope.cancelForm(); 
+          master.saveItem(itemToBeAdded,true);
+          master.sharedData.filter='';
+          scope.cancelForm();
         }
       };
 
@@ -666,11 +665,11 @@ itemApp.directive('listAttachments', function ($filter, master) {
       scope.attachmentTypes=master.sharedData.attachmentTypes;
 
       var initAttachments = function() {
-        _(scope.items).each(function(item){ 
+        _(scope.items).each(function(item){
           item.checked = item.wasChecked = _(scope.formItem.attachments).find(function(attachment){
             return attachment === item.uid;
           })?true:false;
-         
+
         });
       };
 
@@ -680,9 +679,9 @@ itemApp.directive('listAttachments', function ($filter, master) {
         //update the scoped item
         scope.formItem.attachments=_.chain(scope.items)
           .filter(function(item){ return item.checked; })
-          .map(function(item){ 
+          .map(function(item){
 
-            return item.uid; 
+            return item.uid;
 
         }).value();
         initAttachments();
@@ -691,13 +690,13 @@ itemApp.directive('listAttachments', function ($filter, master) {
 
 
       //scope.newItemAsAttachment = function(){
-        
+
         //master.saveItem({name:scope.textFilter, createdBy:master.sharedData.email, type:scope.attachmentType}).then(function(res){
           //var all = scope.getAttachables();
           // var newOnes = [];
           // var current = _(scope.items).map(function(theOne){ return theOne.uid; });
           // _.filter(all, function(theOne){ if(itdoesntmatch) { newOnes.push(theOne) });
-          // _.forEach(newOnes, function(newOne){ 
+          // _.forEach(newOnes, function(newOne){
           //   newOne.newItem = true;
           //   scope.items.push(newOne);
           // })
@@ -739,11 +738,11 @@ itemApp.directive('imageSearch', function ($http, master) {
     link: function(scope, element, attrs) {
 
       scope.results = [];
-      var url = 'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&safe=active&callback=JSON_CALLBACK&q=';
-      
+      var url = 'https://pixabay.com/api/?key=6323423-e79609f9415c8744855b77677&q=';
+
       scope.$watch('searchTerm', function (searchTerm) {
-        $http.jsonp(url + searchTerm).then(function (response) {
-            scope.results = response.data.responseData.results;
+        $http.get(url + searchTerm).then(function (response) {
+            scope.results = response.data.hits;
         });
       });
 
@@ -766,13 +765,13 @@ itemApp.directive('itemPriority', function ($state, $http, master) {
     templateUrl: 'html/itemPriority.html',
     link: function(scope, element, attrs) {
       scope.sharedData=master.sharedData;
-      scope.changePriority = function(how) { 
+      scope.changePriority = function(how) {
         var temp = _.findWhere(scope.item.priority,{email:scope.sharedData.email});
         if (temp) {userPriority=temp.value}else{userPriority=0;}
-        
+
         $http.post('/api/setPriority',{
-          uid:scope.item.uid, 
-          email:scope.sharedData.email, 
+          uid:scope.item.uid,
+          email:scope.sharedData.email,
           value:(userPriority===how)?0:how
         });
       };
@@ -793,7 +792,7 @@ itemApp.directive('listItem', function ($state, $http, master) {
       scope.showMoreDetail = {};
       scope.sharedData = master.sharedData;
       scope.colors = master.color(scope.item);
-      
+
 
       if (scope.page === 'view') { scope.showMoreDetail[scope.item.uid]=true; }
 
@@ -851,13 +850,13 @@ itemApp.directive('itemDetail', function ($state, $filter, $http, master) {
         scope.wants = [];
         scope.others = [];
         _(attachments).each(function(uid){
-          var item = scope.findAttachment(uid); 
+          var item = scope.findAttachment(uid);
           if (item.need==='have') { scope.haves.push(item); }
           else if (item.need==='want') { scope.wants.push(item); }
           else { if (item.type!=='project') { scope.others.push(item);} }
         });
       };
-      
+
 
 
       scope.addComment = function(item){
@@ -901,7 +900,7 @@ itemApp.directive('itemToolbar', function ($state, $http, master) {
 
       scope.addMediaImageSave = function(media) {
         if (media) {
-          if(!scope.item.media) { scope.item.media=[]; } 
+          if(!scope.item.media) { scope.item.media=[]; }
           scope.item.media.push({'rawImage':media});
           master.saveItem(scope.item);
           scope.addMediaImage=false;
@@ -916,7 +915,7 @@ itemApp.directive('itemToolbar', function ($state, $http, master) {
       scope.addPlanClick = function() {
         scope.addPlan=!scope.addPlan;
       };
-      scope.$on('closePlan', function() { 
+      scope.$on('closePlan', function() {
         scope.addPlan = false;
       });
 
@@ -924,7 +923,7 @@ itemApp.directive('itemToolbar', function ($state, $http, master) {
         scope.addBudget=!scope.addBudget;
       };
 
-      scope.$on('closeBudget', function() { 
+      scope.$on('closeBudget', function() {
         scope.addBudget = false;
       });
 
@@ -954,7 +953,7 @@ itemApp.directive('itemToolbar', function ($state, $http, master) {
 
         });
         scope.addProposal=false;
-        
+
       }
 
       scope.addToProject = function(theUID) {
@@ -1003,7 +1002,7 @@ itemApp.directive('itemChange', function ($state, $http, $filter, master) {
         console.log('decision!');
         angular.copy(staged.changes,scope.changed);
       });
-      
+
 
       scope.mergeChange = function (field, value, yesno){
         console.log(field+" is going to be "+value);
@@ -1029,7 +1028,7 @@ itemApp.directive('itemChange', function ($state, $http, $filter, master) {
         decisionObj['item']=scope.item;
 
         $http.post('/api/decision',decisionObj).then(function (response){
-          
+
         });
       };
     }
@@ -1089,25 +1088,25 @@ itemApp.directive('addPlanForm', function ($state, $http, master) {
     link: function(scope, element, attrs) {
       scope.dbInfo=master.getDbInfo;
       scope.sharedData=master.sharedData;
-      if (scope.plan) { 
+      if (scope.plan) {
         scope.formPlan=scope.plan;
       } else {
         scope.formPlan={};
         scope.formPlan['type']='plan';
       }
-      
+
       //this should be able to take an argument for whether or not it updates the plan or creates a sibling
       scope.savePlan = function(assign){
 
         if(scope.formPlan.steps) {
-          
+
           if (assign){
             //add step to item attachments
             if (!scope.item.attachments) { scope.item.attachments = []; }
             _(scope.formPlan.steps).each(function(step){
               if (step.uid){ scope.item.attachments.push(step.uid); }
             });
-              
+
             scope.item.plan = scope.formPlan;
           }
           master.pushToItem(_(scope.item).pick(['uid','plan','attachments']));
@@ -1132,7 +1131,7 @@ itemApp.directive('addStep', function ($state, $http, master) {
       scope.sharedData=master.sharedData;
       scope.color = master.color;
       scope.items = master.items;
-      
+
 
       scope.addTextAsStep = function(){
         if (!scope.plan.steps) { scope.plan.steps = []; }
@@ -1161,7 +1160,7 @@ itemApp.directive('listSteps', function ($state, $http, master) {
     link: function(scope, element, attrs) {
       scope.dbInfo=master.getDbInfo;
       scope.sharedData=master.sharedData;
-      
+
       scope.removeStep = function (index) {
         var step = scope.plan.steps[index];
         if (step.uid) {
@@ -1175,7 +1174,7 @@ itemApp.directive('listSteps', function ($state, $http, master) {
         scope.plan.steps.splice(from, 1);
         scope.plan.steps.splice(to, 0, step);
       };
-      
+
 
     }
   }
@@ -1196,7 +1195,7 @@ itemApp.directive('listStep', function ($state, $http, master) {
         scope.getItem = _(master.items).findWhere({uid:scope.step.uid});
         scope.color = master.color(scope.getItem);
       }
-      
+
 
     }
   }
@@ -1220,8 +1219,8 @@ itemApp.directive('listBudget', function ($state, $http, master) {
       scope.newLine = {};
 
       if (scope.editBudget) {
-        if (!scope.budget) { 
-          scope.budget = {}; 
+        if (!scope.budget) {
+          scope.budget = {};
           scope.budget.lines = [];
           if (scope.item.attachments) {
             //loop throught and add
@@ -1251,7 +1250,7 @@ itemApp.directive('listBudget', function ($state, $http, master) {
       scope.isNumber = function() {
         if(!$.isNumeric(scope.newLine.price)){ scope.newLine.price = 0 }
       };
-      
+
       scope.saveBudget = function() {
         scope.item.budget = scope.budget;
         master.saveItem(scope.item);
@@ -1282,7 +1281,7 @@ itemApp.directive('listBudget', function ($state, $http, master) {
       //   scope.plan.steps.splice(from, 1);
       //   scope.plan.steps.splice(to, 0, step);
       // };
-      
+
 
     }
   }
@@ -1298,7 +1297,7 @@ itemApp.directive('listResult', function ($state, $http, master) {
     },
     templateUrl: 'html/listResult.html',
     link: function(scope, element, attrs) {
-      
+
       scope.saveResult = function (){
         delete scope.result.edit;
         scope.proposal[scope.result.who]=scope.result;
@@ -1312,7 +1311,7 @@ itemApp.directive('listResult', function ($state, $http, master) {
         });
 
         debug=pushComponents;
-        
+
       };
 
     }
@@ -1355,7 +1354,7 @@ itemApp.directive('addMediaImageForm', function ($state, $http, master) {
               scope.errorMsg = 'nothing is supported';
             }
           }
-        
+
         });//END take picture 'on' event
       }
 
@@ -1366,13 +1365,13 @@ itemApp.directive('addMediaImageForm', function ($state, $http, master) {
 
 itemApp.filter('regex', function() {
   return function(input, field, regex) {
-    var patt = new RegExp(regex);      
+    var patt = new RegExp(regex);
     var out = [];
     for (var i = 0; i < input.length; i++){
       if(patt.test(input[i][field])){
         out.push(input[i]);
       }
-    }      
+    }
     return out;
   };
 });
@@ -1383,6 +1382,3 @@ function generateKey() {
       return v.toString(16);
   });
 }
-
-
-
